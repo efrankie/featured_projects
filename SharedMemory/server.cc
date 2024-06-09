@@ -19,12 +19,10 @@ int main(int argc, char *argv[])
     {
         // Set up N shared memory regions
         shmpath = argv[i];
-        //cout << "made it here to server " << ct++ << endl;
         fd = shm_open(shmpath, O_CREAT | O_RDWR, 0600);
         checkOpen(fd);
         // truncate to size needed
         if (ftruncate(fd, 100) == -1)
-            //cerr << "ERROR: truncate better\n";
             errExit("Error: Truncate better");
             
         // map error check

@@ -12,7 +12,6 @@ struct timespec ts;
 
 int main(int argc, char *argv[])
 {
-    //cout << " made it here to client\n";
     // Opens and maps the named region
     int fd = shm_open(argv[1], O_RDWR, 0);
     checkOpen(fd);
