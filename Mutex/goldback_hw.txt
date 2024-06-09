@@ -1,0 +1,40 @@
+https://en.wikipedia.org/wiki/Goldbach%27s_conjecture
+
+Your assignment is to find the Golbach pair with the largest minimum prime.
+
+The Goldbach conjecture is that for ever even number more than 2, there is
+a pair of odd primes that add to that number.  For example, 8=5+3 and 
+12=7+5.  Below is a list of Goldbach pairs with who's smallest 
+prime is large.
+
+You must write in c++.  You must use threading.  All accesses to a
+'max' variable when there are multiple accesses including at least one
+possible writer must be done under lock.
+
+Points:
+1 million - produces the right answer
+1 million - uses threads
+1 million - uses locks
+30 thousand - finds the largest such number of all students who submit
+Due: Thr Sep 14th
+
+
+6 3 3
+12 5 7
+30 7 23
+98 19 79
+220 23 197
+308 31 277
+556 47 509
+992 73 919
+2642 103 2539
+5372 139 5233
+7426 173 7253
+43532 211 43321
+54244 233 54011
+63274 293 62981
+113672 313 113359
+128168 331 127837
+194428 359 194069
+194470 383 194087
+413572 389 413183
