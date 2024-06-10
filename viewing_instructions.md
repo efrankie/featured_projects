@@ -1,0 +1,1 @@
+Use this link to view the html file: [wildfires.html](https://htmlpreview.github.io/?https://github.com/efrankie/featured_projects/blob/main/Wildfires_R/wildfires.html)
