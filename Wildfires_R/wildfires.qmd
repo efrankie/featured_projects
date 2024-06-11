@@ -1,0 +1,185 @@
+---
+title: "The Evolution of Wildfires: California"
+author: "Frankie Wilson"
+format: html
+editor: visual
+---
+
+# Wildfires Throughout the Years (1992-2020)
+
+In the last several decades there has been a noticeable trend regarding the increase in fires in the United States. Not just in the States, but in the world as a whole. People are concerned, and for good reason-- when the land is dry they can spread quickly and be hard to contain.
+
+California especially has been a hot topic regarding its fire situation. California has been known for years to have many fires, but what has been changing to make this situation more dangerous? What trends can be found from looking at this data? And are fires really becoming more dangerous or are we only just now paying more attention?
+
+# Accessing the Data
+
+The data I am using for this project is from the US Department of Agriculture (more specifically, Karen C. Short) and can be found here: <https://www.fs.usda.gov/rds/archive/catalog/RDS-2013-0009.6>
+
+# Preparing the Data
+
+The dataset I am working with is quite large at 2,300,000+ occurrences. As such, I found the need to break the data up into smaller subsets so that it is easier to work with. During this process I created a few new variables: discovery, containment, fire_duration, and fire_severity.
+
+*discovery* - combines the date and time of day for when a fire was discovered.\
+*containment* - combines the date and time of day for when a fire was contained.\
+*fire_duration* - calculates how long a fire lasts from discovery to containment in minutes.\
+*fire_severity* - calculated by multiplying the size of the fire by its duration.
+
+```{r}
+source("wildfires_wrangling.R")
+```
+
+# Finally, Working With the Data
+
+```{r}
+# creating a basic bar plot to view the number of fires (by size) over the years
+ggplot(fod_CA, aes(x = fire_year, fill = fire_size_class)) +
+  geom_bar()  +
+  labs(
+    title = "30 Years of Californian Wildfires",
+    x = "Year",
+    y = "Count",
+    fill = "Fire Size Class",
+    caption = "Data provided by USDA") +
+  scale_fill_brewer(palette="YlOrRd")
+```
+
+Given the above bar chart it could be easy to dismiss the big question. While 2020 is the most recent year it hasn't been the year with the most fires. No, that honor falls to 2007. However, if we look closer at fires of size G (which are 5000+ acres in size) there may be a more interesting trend.
+
+```{r}
+# filtering the data 
+fod_CA_G <- fod_CA |> filter(fire_size_class == "G")
+# making essentially the same plot, but focusing on the largest fire sizes
+ggplot(fod_CA_G, aes(x = fire_year, fill = fire_size_class)) +
+geom_bar()  +
+  labs(
+    title = "California's Largest Fires",
+    x = "Year",
+    y = "Count",
+    fill = "Fire Size Class",
+    caption = "Data provided by USDA")
+```
+
+Now let's bring this back and look at not just the size classification, but the actual size of the fires throughout the years.
+
+```{r}
+ggplot(fod_CA, aes(x = fire_year, y = fire_size, color = fire_size_class)) +
+  geom_point()  +
+  labs(
+    title = "California's Largest Fires: Take 2",
+    x = "Year",
+    y = "Size",
+    color = "Fire Size Class",
+    caption = "Data provided by USDA")+
+  scale_color_brewer(palette="YlOrRd")
+```
+
+## So How do Severity and Duration factor in?
+
+Using the fire_duration and fire_severity variables I created earlier I calculated the averages across a handful of years.
+
+```{r}
+year <- c(1992,1995,2000,2005,2010,2015,2016,2017,2018,2019,2020)
+
+size <- c(
+  mean(CA_1992$fire_size, na.rm=TRUE),
+  mean(CA_1995$fire_size, na.rm=TRUE),
+  mean(CA_2000$fire_size, na.rm=TRUE),
+  mean(CA_2005$fire_size, na.rm=TRUE),
+  mean(CA_2010$fire_size, na.rm=TRUE),
+  mean(CA_2015$fire_size, na.rm=TRUE),
+  mean(CA_2016$fire_size, na.rm=TRUE), 
+  mean(CA_2017$fire_size, na.rm=TRUE), 
+  mean(CA_2018$fire_size, na.rm=TRUE),
+  mean(CA_2019$fire_size, na.rm=TRUE),
+  mean(CA_2020$fire_size, na.rm=TRUE))
+
+duration <- c(
+  mean(CA_1992$fire_duration, na.rm=TRUE),
+  mean(CA_1995$fire_duration, na.rm=TRUE),
+  mean(CA_2000$fire_duration, na.rm=TRUE),
+  mean(CA_2005$fire_duration, na.rm=TRUE),
+  mean(CA_2010$fire_duration, na.rm=TRUE),
+  mean(CA_2015$fire_duration, na.rm=TRUE),
+  mean(CA_2016$fire_duration, na.rm=TRUE), 
+  mean(CA_2017$fire_duration, na.rm=TRUE), 
+  mean(CA_2018$fire_duration, na.rm=TRUE),
+  mean(CA_2019$fire_duration, na.rm=TRUE),
+  mean(CA_2020$fire_duration, na.rm=TRUE))
+
+severity <- c(
+  mean(CA_1992$fire_severity, na.rm=TRUE),
+  mean(CA_1995$fire_severity, na.rm=TRUE),
+  mean(CA_2000$fire_severity, na.rm=TRUE),
+  mean(CA_2005$fire_severity, na.rm=TRUE),
+  mean(CA_2010$fire_severity, na.rm=TRUE),
+  mean(CA_2015$fire_severity, na.rm=TRUE),
+  mean(CA_2016$fire_severity, na.rm=TRUE), 
+  mean(CA_2017$fire_severity, na.rm=TRUE), 
+  mean(CA_2018$fire_severity, na.rm=TRUE),
+  mean(CA_2019$fire_severity, na.rm=TRUE),
+  mean(CA_2020$fire_severity, na.rm=TRUE))
+
+df <- data.frame(year, size, duration, severity)
+df |> arrange(desc(severity))
+```
+
+Here we can see that 2020, the most recent year, is coming out on top with the most severe fires on average. Not only that, but all of the more recent years are showing to have more severe fires.
+
+```{r}
+# displaying the above df as a connected scatter plot
+ggplot(df, aes(x = year, y = severity)) +
+  geom_line(color = "grey") +
+  # adding red circles at the datapoints 
+  geom_point(shape = 21, color = "black", fill = "red", size = 6) +
+  labs(
+    title = "Evolution of Fire Severity",
+    x = "Year",
+    y = "Severity",
+    caption = "Data provided by USDA")
+```
+
+# Gaining Perspective
+
+```{r}
+# selecting which feature IDs to show on the map 
+IDs <- c("oid","latitude","longitude","state","fips_name",
+         "owner_descr","fire_code", "fire_name","discovery",
+         "containment","fire_duration","fire_severity","fire_size",
+         "fire_size_class","nwcg_cause_classification",
+         "nwcg_general_cause","nwcg_cause_age_category")
+
+# creating an interactive map that will plot CA fires from 2020 via latitude and longitude
+# each point on the map is clickable and will pull up features associated with that point 
+mapviewOptions(basemaps = "OpenStreetMap.DE") #<- limits which maps can be chosen
+map_2020 <- CA_2020 |> mapview(
+  xcol = "longitude",
+  ycol = "latitude",
+  zcol = "fire_size_class", # coloring by fire_class
+  col.regions =  brewer.pal(7, "YlOrRd"),
+  cex = "fire_size", # points on the map will vary by fire size (in acres)
+  crs = "NAD83", # coordinate system
+  grid = FALSE,
+  popup = popupTable(CA_2020, zcol = IDs),
+  layer.name = "Fire Size Class",
+  legend = TRUE)
+map_2020
+
+# same deal, different years
+map_1992 <- CA_1992|> mapview(
+  xcol = "longitude",
+  ycol = "latitude",
+  zcol = "fire_size_class",
+  col.regions =  brewer.pal(7, "YlOrRd"),
+  cex = "fire_size",
+  crs = "NAD83",
+  grid = FALSE,
+  popup = popupTable(CA_2020, zcol = IDs),
+  layer.name = "Fire Size Class")
+map_1992
+```
+
+These maps only cover two different years, but they do a great job of highlighting what all the data has been saying so far:
+
+Fires in California are getting worse, and to a fairly significant degree. The amount of fires may not be at it's highest, but the intensity and size are growing at a concerning rate.
+
+In this project I was only able to explore this data to a small degree. Given more time I would like to figure out why the fires are getting worse and if there are similar trends being shown across the other states. Since we're given coordinates as well as time of year for each fire it would interesting to see what environmental factors come into play as well. How many fires are started by humans vs nature? How much of a role does nature still play in the human-caused fires?
